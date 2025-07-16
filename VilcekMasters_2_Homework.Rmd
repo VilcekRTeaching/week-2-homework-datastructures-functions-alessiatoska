@@ -1,0 +1,215 @@
+---
+title: "Masters Homework 2"
+author: "Alessia Toska"
+date: "7/21/2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = TRUE}
+nyc <- read.csv("https://raw.githubusercontent.com/fredlapolla/RVilcekMaster23/master/NYC_HANES_DIAB.csv")
+```
+>- Find summary information about the total blood mercury levels in our NYC HANES data (hint: names(nyc) will call the names of each column). What is the max value, what is the minimum value.  
+
+```{r}
+summary(nyc$MERCURYTOTALBLOOD)
+max(nyc$MERCURYTOTALBLOOD, na.rm=T)
+min(nyc$MERCURYTOTALBLOOD, na.rm=T)
+```
+
+>- Bonus/Challenge: What is the Standard Deviation and skewness of the blood mercury?
+
+```{r}
+#standard deviation
+sd(nyc$MERCURYTOTALBLOOD, na.rm = TRUE)
+```
+#skewness manually
+```{r}
+x <- na.omit (nyc$MERCURYTOTALBLOOD)
+
+n <- length(x)
+mean_x <- mean(x)
+sd_x <- sd(x)
+
+skewness_formula<- (n * sum((x - mean_x)^3)) / ((n - 1) * (n - 2) * sd_x^3)
+
+skewness_formula
+```
+
+
+>- Install a package and load, such as "ggplot2" or "dplyr"
+
+```{r}
+install.packages("ggplot2")
+library(ggplot2)
+```
+
+>- What two commands are needed to install and use a package in R?
+
+#example with dplyr
+```{r}
+install.packages("dplyr")
+library(dplyr)
+```
+
+
+
+>- When you read in a .csv file into R, what class is the object that you read in (like nyc)?
+
+A data frame
+
+
+>- What command can you use to determine what type of data is in a column?
+
+```{r}
+class(nyc$GENDER) #taking gender as an example
+```
+
+
+>- Provide a command to find the type of data in the DX_DBTS column of nyc. 
+
+```{r}
+class(nyc$DX_DBTS)
+```
+
+
+>- Provide the same command the type of data but use the other way of indexing from what you did above. 
+
+```{r}
+class(nyc[, "DX_DBTS"])
+```
+
+
+>- What would happen if we had chosen the first 4 columns of NYC HANES and made a matrix? What would the class of the cells in this matrix be? Why?
+
+```{r}
+mini_matrix <- as.matrix(nyc[, 1:4])
+class(mini_matrix)
+```
+R shows both classes because a matrix is simply a 2 dimensional array in R’s class hierarchy, so it inherits the general array class alongside the more specific matrix class.
+
+>- If we make a vector,vec<- c(3,9,4,7,8,9), and multiply it by WannaMatrix, what is the value in the third row, third column? 
+
+```{r}
+WannaMatrix <- nyc[5:10, 6:9]
+WannaMatrix <- as.matrix(WannaMatrix,nrow = 6, ncol = 4)
+
+vec <- c(3, 9, 4, 7, 8, 9)
+
+new_mat <- WannaMatrix * vec 
+
+new_mat[3, 3]  
+
+```
+
+
+
+>- What happens if instead we made a vector vec2 <- c(3,9,4,7,8) and multiply it by WannaMatrix, what is the third row, third column value? What is going on? 
+
+```{r}
+vec2 <- c(3,9,4,7,8)
+new_mat2 <- WannaMatrix * vec2
+
+new_mat2[3, 3]  
+```
+
+
+>- Look up the arguments for read.csv
+
+```{r}
+?read.csv
+
+#or
+
+args(read.csv)
+```
+
+
+>- Use apply() to find the median value of CADMIUM, LEAD CHOLESTEROLTOTAL, GLUCOSESI, CREATININESI, and CREATININE
+
+```{r}
+cols<- c("CADMIUM", "LEAD", "CHOLESTEROLTOTAL", "GLUCOSESI", "CREATININESI", "CREATININE")
+
+median_all <- apply(nyc[, cols], 2, median, na.rm = TRUE)
+
+median_all
+```
+
+>- Do the same using sapply()
+
+```{r}
+sapply_median <- sapply(nyc[, cols], median, na.rm = TRUE)
+sapply_median
+```
+
+>- Use a for loop to find the median value of columns 16:19
+
+```{r}
+for( i in 16:19) {
+  value <- median(nyc[,i], na.rm = TRUE)
+  print(c(colnames(nyc[i]), value))
+}
+```
+
+>- Make a for loop to find the standard deviation (hint sd() ) of CHOLESTEROLTOTAL, GLUCOSESI, CREATININESI, AND CREATININE
+
+```{r}
+for (i in 16:19) {
+  sd_value <-sd(nyc[,i], na.rm = TRUE)
+  print(c(colnames(nyc)[i], sd_value))
+}
+```
+
+
+>- Bonus/Challenge Create a vector in which to put the standard deviations 
+
+```{r}
+st_dev <- sapply(nyc[16:19], sd, na.rm = TRUE)
+st_dev
+
+#is.vector(st_dev) #just checking
+```
+
+
+>- Use ifelse to create a new variable of high and normal A1C dichotomizing with 7 as a threshold for high levels
+
+```{r}
+nyc$A1C_status <- ifelse(nyc$A1C > 7, "high", "normal")
+#head(nyc$A1C_status) #just checking
+```
+
+
+>- Subset to only have females (gender == "female")
+
+```{r}
+nyc_female <- subset(nyc, GENDER == "2") #im assuming the females are gender 2 
+```
+
+
+>- Create a subset of males and find the median total cholesterol level
+
+```{r}
+nyc_male <- subset(nyc, GENDER == "1")
+median(nyc_male$CHOLESTEROLTOTAL, na.rm = TRUE)
+```
+
+
+>- Try to create a summary of the mean A1C using two factors, GENDER and DX_DBTS
+
+```{r}
+by(nyc$A1C,
+   INDICES = list(Gender   = nyc$GENDER,
+                  Diabetes = nyc$DX_DBTS),
+   FUN     = mean,
+   na.rm   = TRUE)
+```
+
+Find the class of the first three columns of data. What are they?
+
+```{r}
+sapply(nyc[ , 1:3], class)
+```
+
