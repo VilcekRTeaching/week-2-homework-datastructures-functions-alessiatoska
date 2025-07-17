@@ -185,14 +185,15 @@ nyc$A1C_status <- ifelse(nyc$A1C > 7, "high", "normal")
 >- Subset to only have females (gender == "female")
 
 ```{r}
-nyc_female <- subset(nyc, GENDER == "2") #im assuming the females are gender 2 
+nyc$GENDER <-factor(nyc$GENDER, labels = c("male", "female"))
+nyc_female <- subset(nyc, GENDER == "female") #im assuming the females are gender 2 
 ```
 
 
 >- Create a subset of males and find the median total cholesterol level
 
 ```{r}
-nyc_male <- subset(nyc, GENDER == "1")
+nyc_male <- subset(nyc, GENDER == "male")
 median(nyc_male$CHOLESTEROLTOTAL, na.rm = TRUE)
 ```
 
